@@ -9,6 +9,10 @@ app = Flask(__name__)
 def hello_username(username):
     return f'Hello { escape(username) }!'
 
+@app.route('/echo/<int:post_id>')
+def show_post(post_id: int):
+    return f'Post {post_id}'
+
 @app.route('/')
 def index():
     return f'{datetime.datetime.now()}'
