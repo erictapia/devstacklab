@@ -13,6 +13,10 @@ def hello_username(username):
 def show_post(post_id: int):
     return f'Post {post_id}'
 
+@app.route('/api/v0/<path:subpath>')
+def api_v0(subpath):
+    return f'The subpath is: { escape(subpath) }'
+
 @app.route('/')
 def index():
     return f'{datetime.datetime.now()}'
