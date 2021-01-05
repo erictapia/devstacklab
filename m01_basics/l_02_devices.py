@@ -5,7 +5,7 @@ import string
 
 from tabulate import tabulate
 
-import constants as CONST
+import util.constants as CONST
 
 
 
