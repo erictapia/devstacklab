@@ -4,7 +4,7 @@ import string
 
 from tabulate import tabulate
 
-import constants as CONST
+import util.constants as CONST
 
 def random_device(ip: int) -> dict:
     device = dict()
