@@ -1,8 +1,8 @@
 from operator import itemgetter
 
-from util import CONST
-from util import create_devices
-from util import print_devices_tabulated
+from util.create_utils import CONST
+from util.create_utils import create_devices
+from util.create_utils import print_devices_tabulated
 
 
 def run() -> None:
