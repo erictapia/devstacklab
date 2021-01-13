@@ -40,8 +40,40 @@ def create_devices(num_devices: int = 10, num_subnets: int = 2) -> list:
     
     return devices
 
+def create_networks(num_devices: int = 1, num_subnets: int=1) -> dict:
+
+    devices = create_devices(num_devices, num_subnets)
+
+    network = dict()
+    network['subnets'] = dict()
+
+    for device in devices:
+        subnet_address_octets = device['ip'].split('.')
+        subnet_address_octets[3] = '0'
+        subnet_address = '.'.join(subnet_address_octets)
+
+        if subnet_address not in network['subnets']:
+            network['subnets'][subnet_address] = dict()
+            network['subnets'][subnet_address]['devices'] = list()
+        
+        network['subnets'][subnet_address]['devices'].append(device)
+
+        interfaces = list()
+        for index in range( 0, choice([2, 4, 8]) ):
+            interface = {
+                'name': f'g0/0/{index}',
+                'speed': choice(['10', '100', '1000'])
+            }
+
+            interfaces.append(interface)
+    
+        device['interfaces'] = interfaces
+    
+    return network
+
 def print_devices_tabulated(devices: list, key: itemgetter) -> None:
     # Print table of devices
     print("\n----- SORTED DEVICES IN TABULAR FORMAT --------------------")
     ordered_devices = sorted(devices, key=key)
     print(tabulate(ordered_devices, headers='keys'))
+
