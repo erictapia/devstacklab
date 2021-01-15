@@ -28,10 +28,10 @@ def create_devices(num_devices: int = 10, num_subnets: int = 2) -> list:
     devices = list()    # Create empty list of devices
 
     # Create random devices
-    for subnet in range(num_subnets):
-        for index in range(num_devices):
+    for subnet in range(num_subnets + 2):
+        for octet in range(1, num_devices + 1):
             # Device IP
-            ip = f'10.0.{subnet + 1}.{index + 1}'
+            ip = f'10.0.{subnet}.{octet}'
             
             device = random_device(ip)
             
