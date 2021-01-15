@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
         if ip_to_find in devices_dict:
             dict_search_time = ( time.time() - start_time ) * 1000
-            print_found("DICT SEARCH", device, dict_search_time)
+            print_found("DICT SEARCH", devices_dict[ip_to_find], dict_search_time)
 
         else:
             dict_search_time = ( time.time() - start_time ) * 1000
