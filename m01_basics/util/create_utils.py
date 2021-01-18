@@ -32,13 +32,25 @@ def create_devices(num_devices: int = 10, num_subnets: int = 2) -> list:
         for octet in range(1, num_devices + 1):
             # Device IP
             ip = f'10.0.{subnet}.{octet}'
-            
+
             device = random_device(ip)
-            
+
             # Append device to list of devices
             devices.append(device)
-    
+
     return devices
+
+def create_devices_generator(num_devices: int = 10, num_subnets: int = 2):
+    # Create random devices
+    for subnet in range(num_subnets + 2):
+        for octet in range(1, num_devices + 1):
+            # Device IP
+            ip = f'10.0.{subnet}.{octet}'
+
+            device = random_device(ip)
+
+            yield device
+
 
 def create_networks(num_devices: int = 1, num_subnets: int=1) -> dict:
 
@@ -55,7 +67,7 @@ def create_networks(num_devices: int = 1, num_subnets: int=1) -> dict:
         if subnet_address not in network['subnets']:
             network['subnets'][subnet_address] = dict()
             network['subnets'][subnet_address]['devices'] = list()
-        
+
         network['subnets'][subnet_address]['devices'].append(device)
 
         interfaces = list()
@@ -66,9 +78,9 @@ def create_networks(num_devices: int = 1, num_subnets: int=1) -> dict:
             }
 
             interfaces.append(interface)
-    
+
         device['interfaces'] = interfaces
-    
+
     return network
 
 def print_devices_tabulated(devices: list, key: itemgetter) -> None:
