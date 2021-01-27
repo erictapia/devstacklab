@@ -136,3 +136,42 @@ async def read_multiple_path(
 @app.get("/required/items/{item_id}")
 async def read_required(item_id: str, needy: str):
     return {"item_id": item_id, "needy": needy}
+
+
+# Declaring a request body
+# - use a Pydantic model
+# - use default for optional attributes
+# - a type None will result in a JSON value of null
+from pydantic import BaseModel
+
+class Item(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    tax: Optional[float] = None
+
+@app.post("/post/items/")
+async def create_item(item: Item):
+    item_dict = item.dict()
+
+    if item.tax:
+        price_with_tax = item.price + item.tax
+        item_dict.update({"price_with_tax": price_with_tax})
+
+    return item_dict
+
+# Declaring path parameters and request body
+@app.put("/put/items/{item_id}")
+async def put_item(item_id: int, item: Item):
+    return {"item_id": item_id, **item.dict()}
+
+
+# Declaring path parameters, request body, and query
+@app.put("/put/query/{item_id}")
+async def put_item(item_id: int, item: Item, q: Optional[bool] = None):
+    result = {"item_id": item_id, **item.dict()}
+
+    if q:
+        result.update({"q": q})
+
+    return result
