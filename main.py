@@ -175,3 +175,89 @@ async def put_item(item_id: int, item: Item, q: Optional[bool] = None):
         result.update({"q": q})
 
     return result
+
+# Adding additional validation with fastapi.Query
+# Validating min/max length and value must match a regex
+# - declaring a default value will use a Query object
+from fastapi import Query
+
+@app.get("/optional/validation/items")
+async def optional_validate_items(q: Optional[str] = Query(None, min_length=1, max_length=10, regex="^fixedquery$")):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+
+    if q:
+        results.update({"q": q})
+
+    return results
+
+# Declaring a default value with validation
+# - unless query parameter equals the regex, q = "default value"
+@app.get("/default/validation/items")
+async def optional_validate_items(q: Optional[str] = Query("default value", min_length=1, max_length=10, regex="^fixedquery$")):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+
+    results.update({"q": q})
+
+    return results
+
+# Declaring a required parameter
+# - use a Query object with a value of ... on first argument
+@app.get("/required/validation/items")
+async def required_validate_items(q: str = Query(..., min_length=1, max_length=10)):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+
+    results.update({"q": q})
+
+    return results
+
+
+# Declaring a query parameter that will have a List of strings
+# - must use the Query object to define validation rules and default value
+# - use Optional for an optional query parameter
+# - list canbe used instead of List but there will be no validation
+from typing import List
+
+@app.get("/list/items")
+async def list_items(q: Optional[List[str]] = Query(["foo", "bar"])):
+    query_items = {"q": q}
+    return query_items
+
+
+# Adding additional OpenAPI documentation via a Query object
+# - declare a keyword argument name title, this will be seen in the ../redoc page
+# - delcare a keyword argument name description, this will be seen on both ../docs and ../redoc
+from typing import List
+
+@app.get("/docs/list/items")
+async def docs_list_items(
+        q: Optional[List[str]] = Query(
+            ["Foo", "Bar"],
+            title="List of strings",
+            description="Query string for the items to search in the database."
+        )
+):
+    query_items = {"q": q}
+    return query_items
+
+# Using alias query parameter names which are not valid in Python
+@app.get("/invalid/name/")
+async def invalid_name(q: Optional[str] = Query(None, alias="item-query")):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+
+    if q:
+        results.update(({"q": q}))
+
+    return results
+
+
+# Deprecating parameters so it shows on the docs
+# - use a Query object
+# - use keyword argument deprecated=True in the Query object
+@app.get("/deprecating/items")
+async def deprecating_items(q: Optional[str] = Query(None, alias="item-query", deprecated=True)):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+
+    if q:
+        results.update(({"q": q}))
+
+    return results
