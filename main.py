@@ -261,3 +261,55 @@ async def deprecating_items(q: Optional[str] = Query(None, alias="item-query", d
         results.update(({"q": q}))
 
     return results
+
+
+# Validating and metadata on path parameters using fastapi Path
+# - use ... as default for required path parameters
+# - use Optional[type] for optional
+from fastapi import Path
+
+@app.get("/path/validation/{item_id}")
+async def path_validation(
+    item_id: int = Path(..., title="The ID of the item to get"),
+    q: Optional[str] = Query(None, alias="item-query")
+):
+    results = {"item_id": item_id}
+
+    if q:
+        results.update({"q": q})
+    
+    return results
+
+
+# Number validation with greater than or equal declaration
+# - use ge as condition for the path parameter number
+# - the * is a work around for python requiring parameters without a default
+#   be declared first. 
+# - other validators include: gt, lt, le 
+@app.get("/ge/items/{item_id}")
+async def ge_items(
+    *, item_id: int = Path(..., title="The ID of the item to get", ge=1), q: str
+):
+    results = {"item_id": item_id}
+    
+    if q:
+        results.update({"q": q})
+    
+    return results
+
+
+@app.get("/float/items/{item_id}")
+async def float_items(
+    *,
+    item_id: int = Path(..., title="The ID of the item to get", ge=0, le=1000),
+    q: str,
+    size: float = Query(..., gt=0, lt=10.5)
+):
+    results = {
+        "item_id": item_id,
+        "q": q,
+        "size": size
+    }
+    
+    return results
+    
