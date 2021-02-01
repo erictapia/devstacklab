@@ -214,7 +214,7 @@ async def required_validate_items(q: str = Query(..., min_length=1, max_length=1
 # Declaring a query parameter that will have a List of strings
 # - must use the Query object to define validation rules and default value
 # - use Optional for an optional query parameter
-# - list canbe used instead of List but there will be no validation
+# - list can be used instead of List but there will be no validation
 from typing import List
 
 @app.get("/list/items")
@@ -312,4 +312,60 @@ async def float_items(
     }
     
     return results
-    
+
+
+# Mixing path, query, and request body parameter declarations
+# - use Item(BaseModel) for defining the body object
+# - single json object is passed in request with only the kv pairs of object
+
+@app.put("/mixed/items/{item_id}")
+async def mixed_update_item(
+        *,
+        item_id:int = Path(..., title="The ID of the item to get", ge=0, le=1000),
+        q: Optional[str] = None,
+        item: Optional[Item] = None
+):
+    results = {"item_id": item_id}
+
+    if q:
+        results.update({"=q": q})
+
+    if item:
+        results.update({"item": item})
+
+    return results
+
+
+# Multiple body parameters
+# - a single json object is passed in request: { obj1, obj2, ..., objn}
+# - each body parameter will be of form: obj_name: { kv pairs }
+class User(BaseModel):
+    username: str
+    full_name: Optional[str] = None
+
+@app.put("/multibody/items/{item_id}")
+async def multi_body(item_id: int, item:Item, user: User):
+    results = {"item_id": item_id, "item": item, "user": user}
+
+    return results
+
+
+# Declaring a single kv body
+#- use a Body
+from fastapi import Body
+
+@app.put("/body/items/{item_id}")
+async def body_update(item_id: int, item: Item, user: User, importance: int = Body(..., gt=0)):
+    results = {"item_id": item_id, "item": item, "user": user, "importance": importance}
+
+    return results
+
+
+# Embedding kv on single body parameter
+# - add a 'embed=True' argument to the Body
+
+@app.put("/embed/items/{item_id}")
+async def embed_update(item_id: int, item: Item = Body(..., embed=True)):
+    results = {"item_id": item_id, "item": item}
+
+    return results
