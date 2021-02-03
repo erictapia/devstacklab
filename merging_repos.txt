@@ -1,0 +1,5 @@
+The following repositories will be merged.
+- python-52-weeks
+- python_deepdive
+- lab_fastapi
+
