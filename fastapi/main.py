@@ -369,3 +369,28 @@ async def embed_update(item_id: int, item: Item = Body(..., embed=True)):
     results = {"item_id": item_id, "item": item}
 
     return results
+
+# Declaring validation and metadata with Pydantic's Field
+from pydantic import Field
+
+@app.put("/field/items/{item_id}")
+async def field_item(item_id: int, item: Item = Body(..., embed=True)):
+    results = {"item_id": item_id, "item": item}
+
+    return results
+
+
+# Declaring model attributes of type Field
+class NewItem(BaseModel):
+    name: str
+    description: Optional[str] = Field (
+        None, title="The description of the item", max_length=30
+    )
+    price: float = Field(..., gt=0, description="The price must be greater than zero")
+    tax: Optional[float] = None
+
+@app.put("/newitem/items/{item_id}")
+async def new_item(item_id: int, item: Item = Body(..., embed=True)):
+    results = {"item_id": item_id, "item": item}
+
+    return results
