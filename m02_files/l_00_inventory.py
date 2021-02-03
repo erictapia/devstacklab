@@ -22,6 +22,7 @@ inventory = [
 ]
 
 csv_inventory = [
+    ["name", "hostname", "ssh-port", "ssh-username", "ssh-password"],
     [
         "devnet-csr-always-on-sandbox",
         "ios-xe-mgmt-latest.cisco.com",
