@@ -1,0 +1,17 @@
+ORM = Object-Relational Mapping
+- a pattern
+- maps an object in code and a database tables ("relations")
+- normally a class represents a table in a SQL database
+  - each attribute of the class represents a column with a name and type
+  - each instance represents a row in the database
+- can make connections or relations between tables or entities
+
+Example:
+- table.relation_to_another_table.relation_column
+- orion_cat.owner.name
+
+Common ORMs:
+- Django-ORM
+- SLQAlchemy ORM
+- Peewee
+
