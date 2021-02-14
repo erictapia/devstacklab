@@ -8,6 +8,7 @@ likely change because I don't know what I don't know.
 The List
 
 - Python
+- AsyncIO
 - Javascript
 - HTML & CSS
 - FastAPI / Flask
