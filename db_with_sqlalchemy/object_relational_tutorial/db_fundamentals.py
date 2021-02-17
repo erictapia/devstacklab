@@ -3,6 +3,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy import and_, or_, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import aliased, relationship, sessionmaker
+from sqlalchemy.orm import selectinload, joinedload, contains_eager
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy.sql import exists, func
 
@@ -223,8 +224,8 @@ if __name__ == "__main__":
         print(user.name)
 
     # Binding parameters
-    #print("Querying with binding parameters")
-    #print(session.query(User).filter(text("id<:value and name=:name")).params(value=224, name="fred").order_by(User.id).one())
+    print("Querying with binding parameters")
+    print(session.query(User).filter(text("id<:value and name=:name")).params(value=224, name="fred").order_by(User.id).one())
 
     # String-based statement
     print("Querying with String-based statement")
@@ -349,3 +350,36 @@ if __name__ == "__main__":
     for name, in session.query(User.name).filter(stmt):
         print(name)
         print()
+
+    # Common Relationship Operators
+    # See website: https://docs.sqlalchemy.org/en/13/orm/tutorial.html
+
+    # Eager loading
+    # - selectin load (automatic)
+    # - joined load (automatic)
+    # - explicit join + eagerload
+
+    # selectin load - intended for loading related collections
+    jack = session.query(User).options(selectinload(User.addresses)).filter_by(name="jack").one()
+    print(f"selectinload jack: {jack}")
+    print(f"selecting loadjack.addresses: {jack.addresses}")
+
+    # Joined load - intended for many to one relationships
+    jack = session.query(User).options(joinedload(User.addresses)).filter_by(name="jack").one()
+    print(f"joinedload jack: {jack}")
+    print(f"joinedload jack.addresses: {jack.addresses}")
+
+    # explicit join + eagerload - useful for pre-loading the many to one object on a query that needs to filter
+    # on the same object
+    jack_addresses = session.query(Address).join(Address.user).filter(User.name=="jack").options(contains_eager(Address.user)).all()
+    print(f"eagerload jack: {jack}")
+    print(f"eagerload jack.addresses: {jack.addresses}")
+
+    # Deleting
+    print(f"Before deleting jack, count = {session.query(User).filter_by(name='jack').count()}")
+    print(f"Jack's addresses, count: {session.query(Address).filter(Address.email_address.in_(['jack@google.com', 'j25@yahoo.com'])).count()}")
+    session.delete(jack)
+    print(f"After deleting jack, count = {session.query(User).filter_by(name='jack').count()}")
+    # sqlalchemy will set the address.user to null but will not delete relationships
+    jack_addresses = session.query(Address).filter(Address.email_address.in_(['jack@google.com', 'j25@yahoo.com']))
+    print(f"Jack's addresses, count: {jack_addresses.count()}")
