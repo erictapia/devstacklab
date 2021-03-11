@@ -8,3 +8,4 @@ napalm==3.2.0
 scapy==2.4.4
 lxml==4.6.2
 ncclient==0.6.9
+pyshark==0.4.3
