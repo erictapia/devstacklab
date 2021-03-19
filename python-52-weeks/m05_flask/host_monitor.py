@@ -3,14 +3,16 @@ import socket
 import subprocess
 from time import sleep
 
+import nmap
 import requests
 import scapy.all as scapy
 
 
-MONITOR_INTERVAL = 15
+BASEURL = "http://127.0.0.1:5000"
 DISCOVERY_INTERVAL = 300
 DISCOVERY_SUBNET = input("Enter subnet to be discovered x.x.x.x/xx: ")
-BASEURL = "http://127.0.0.1:5000"
+MONITOR_INTERVAL = 15
+PORTSCAN_INTERVAL = 3600
 
 
 def get_hosts():
@@ -53,7 +55,8 @@ def discovery():
             "mac": mac_addr,
             "hostname": hostname[0],
             "last_heard": last_heard,
-            "availability": True
+            "availability": True,
+            "open_tcp_ports": list()
         }
 
         update_host(host)
@@ -88,8 +91,31 @@ def ping_host(host):
         print(f" !!!  Host ping failed: {host['hostname']}")
 
 
+def portscan_hosts(hosts):
+    for host in hosts.values():
+        if "availability" not in host or not host["availability"]:
+            continue
+
+        ip = host["ip"]
+
+        print(f"====> Scanning host: {host['hostname']} at IP: {host['ip']}")
+        nm = nmap.PortScanner()
+        nm.scan(ip, '22-1024')
+
+        try:
+            nm[ip]
+        except KeyError as e:
+            print(f" !!!  Scan failed: {e}")
+            continue
+
+        print(f"===> Scan results: {nm[ip].all_tcp()}")
+        host["open_tcp_ports"] = nm[ip].all_tcp()
+        update_host(host)
+
+
 def run():
     last_discovery = datetime.now() - timedelta(days=1)
+    last_portscan = datetime.now() - timedelta(days=1)
 
     while True:
 
@@ -98,6 +124,11 @@ def run():
             last_discovery = datetime.now()
 
         hosts = get_hosts()
+
+        if (datetime.now() - last_portscan).total_seconds() > PORTSCAN_INTERVAL:
+            portscan_hosts(hosts)
+            last_portscan = datetime.now()
+
         for host in hosts.values():
             ping_host(host)
             update_host(host)
