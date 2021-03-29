@@ -11,3 +11,4 @@ ncclient==0.6.9
 pyshark==0.4.3
 ntplib==0.3.4
 SQLAlchemy==1.4.3
+Flask-SQLAlchemy==2.5.1
