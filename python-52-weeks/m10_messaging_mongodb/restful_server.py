@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS
 
+from quokka_server_utils import fix_target
 
 app = Flask(__name__)
 CORS(app)

@@ -9,7 +9,7 @@ def start_portscan(target):
     print(f"starting portscan for target: {target}")
     token = str(datetime.now())
     portscan_info = {
-        "quokka": "localhost:5001",
+        "quokka": "localhost:5000",
         "work_type": "portscan",
         "target": target,
         "token": token,
